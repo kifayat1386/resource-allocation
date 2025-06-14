@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from .models import Asset, ResourceUser, Allocation
@@ -20,10 +20,44 @@ class AssetViewSet(viewsets.ModelViewSet):
             'accumulated_depreciation': asset.accumulated_depreciation
         })
 
+    def destroy(self, request, *args, **kwargs):
+        asset = self.get_object()
+
+        # Check if the asset has active allocations
+        if asset.allocations.filter(deallocation_date__isnull=True).exists():
+            return Response({"detail": "Asset is allocated and cannot be deleted."}, status=status.HTTP_400_BAD_REQUEST)
+
+        return super().destroy(request, *args, **kwargs)
+
 class ResourceUserViewSet(viewsets.ModelViewSet):
     queryset = ResourceUser.objects.all()
     serializer_class = ResourceUserSerializer
     permission_classes = [IsAuthenticated]
+
+    def destroy(self, request, *args, **kwargs):
+        # Debugging line to confirm if this method is being entered
+        print("Inside custom destroy method")
+
+        # Get the resource user to delete
+        resource_user = self.get_object()
+
+        # Check if the resource user has any active allocations
+        if resource_user.allocations.filter(deallocation_date__isnull=True).exists():
+            return Response(
+                {"detail": "Resource User has active allocations and cannot be deleted."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Perform the deletion if no active allocations
+        resource_user.delete()
+
+        # Debugging line to confirm if deletion is done
+        print(f"Resource User {resource_user.name} deleted successfully")
+
+        return Response(
+            {"detail": "Resource User successfully deleted."},
+            status=status.HTTP_204_NO_CONTENT
+        )
 
 class AllocationViewSet(viewsets.ModelViewSet):
     queryset = Allocation.objects.all()

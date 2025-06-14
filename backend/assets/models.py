@@ -2,6 +2,9 @@ import uuid
 from django.db import models
 from django.utils import timezone
 from django.core.validators import MinValueValidator
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
+from django.core.exceptions import ValidationError
 
 class Asset(models.Model):
     STATUS_CHOICES = [
@@ -33,6 +36,15 @@ class Asset(models.Model):
         years_used = max(0, min(years_used, self.useful_life_years))  # Cap at useful life
         return self.depreciation_per_year * years_used
 
+    def clean(self):
+        # Check if there are active allocations before deletion
+        if self.allocations.filter(deallocation_date__isnull=True).exists():
+            raise ValidationError("This asset cannot be deleted because it's currently allocated.")
+
+    @receiver(pre_delete, sender="assets.Asset")
+    def prevent_asset_deletion_if_allocated(sender, instance, **kwargs):
+        instance.clean()
+
     def __str__(self):
         return f"{self.far_id} - {self.brand} {self.model_number}"
 
@@ -44,6 +56,15 @@ class ResourceUser(models.Model):
     contact_info = models.CharField(max_length=150, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def clean(self):
+        # Check if the resource is allocated before deletion
+        if self.allocations.filter(deallocation_date__isnull=True).exists():
+            raise ValidationError("This resource user cannot be deleted because they are still allocated an asset.")
+
+    @receiver(pre_delete, sender="assets.ResourceUser")
+    def prevent_user_deletion_if_allocated(sender, instance, **kwargs):
+        instance.clean()
 
     def __str__(self):
         return self.name

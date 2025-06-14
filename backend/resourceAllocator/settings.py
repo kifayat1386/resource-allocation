@@ -89,10 +89,10 @@ WSGI_APPLICATION = 'resourceAllocator.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DATABASE_NAME', 'default_db_name'),
-        'USER': os.getenv('DATABASE_USER', 'default_user'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD', 'default_password'),
-        'HOST': os.getenv('DATABASE_HOST', 'localhost'),
+        'NAME': os.getenv('DATABASE_NAME', 'resource_allocator_db'),
+        'USER': os.getenv('DATABASE_USER', 'allocator_user'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD', 'securepassword'),
+        'HOST': os.getenv('DATABASE_HOST', '127.0.0.1'),
         'PORT': os.getenv('DATABASE_PORT', '5432'),
     }
 }
