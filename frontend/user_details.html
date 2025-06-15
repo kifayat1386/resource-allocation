@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Details</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <header class="navbar">
+      <div class="navbar-left">
+        <nav class="main-nav">
+          <ul>
+            <li id="assetsTab" class="tab-button" onclick="showTab('assets')">Assets</li>
+            <li id="usersTab" class="tab-button" onclick="showTab('users')">Resource Users</li>
+            <li id="allocationsTab" class="tab-button" onclick="showTab('allocations')">Resource Allocations</li>
+          </ul>
+        </nav>
+      </div>
+      <div class="navbar-right">
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+    </header>
+
+    <main class="content">
+      <section id="userDetails">
+        <h2>User Details</h2>
+        <div id="userDetailContent"></div>
+        <button class="create-btn" onclick="deleteUser()">Delete User</button>
+        <button class="create-btn" onclick="updateUser()">Update User</button>
+      </section>
+    </main>
+  </div>
+  <script src="js/app.js"></script>
+</body>
+</html>
