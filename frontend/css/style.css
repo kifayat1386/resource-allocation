@@ -1,7 +1,7 @@
 /* General Body and Container Styles */
 body {
   font-family: 'Inter', sans-serif;
-  background-color: #263238; /* Even deeper ash background color */
+  background-color: #263238;
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -9,20 +9,20 @@ body {
   margin: 0;
   padding: 20px;
   box-sizing: border-box;
-  background-image: url('https://placehold.co/263238/546E7A'); /* Placeholder for a subtle background */
+  background-image: url('https://placehold.co/263238/546E7A');
   background-size: cover;
   background-position: center;
 }
 
 .container {
-  background-color: rgba(255, 255, 255, 0.08); /* Frosted background for main container */
-  backdrop-filter: blur(10px); /* Frosted glass effect */
+  background-color: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
   border-radius: 12px;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3); /* Deeper shadow for transparent card */
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
   width: 100%;
   max-width: 1200px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border for definition */
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Navbar Styles */
@@ -33,7 +33,7 @@ body {
   padding: 16px 24px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   background-color: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(8px); /* Frosted glass effect for navbar */
+  backdrop-filter: blur(8px);
 }
 
 .navbar-left {
@@ -59,7 +59,7 @@ body {
 
 .main-nav ul li:hover,
 .main-nav ul li.active {
-  color: #87CEEB; /* Highlight color for active/hovered tab */
+  color: #87CEEB;
 }
 
 .navbar-right {
@@ -80,10 +80,6 @@ body {
 
 .logout-btn:hover {
   background-color: #6610f2;
-}
-
-.logout-btn:active {
-  transform: translateY(1px); /* Button click effect */
 }
 
 /* Content Area */
@@ -138,11 +134,11 @@ th {
 }
 
 tbody tr:nth-child(odd) {
-  background-color: #f9f9f9; /* Consistent alternating row colors */
+  background-color: #f9f9f9;
 }
 
 tbody tr:nth-child(even) {
-  background-color: #f4f4f4; /* Slightly lighter for even rows */
+  background-color: #f4f4f4;
 }
 
 tr:hover {
@@ -151,7 +147,7 @@ tr:hover {
 
 input {
   padding: 10px;
-  width: 97%; /* Make search bar 97% the width of the table */
+  width: 97%;
   margin-bottom: 20px;
   font-size: 16px;
   border: 2px solid #007bff;
@@ -162,55 +158,9 @@ input:focus {
   border-color: #6610f2;
 }
 
-/* Button Styles */
-button {
-  background-color: #9E9E9E; /* Premium Grey */
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  font-size: 14px;
-  font-weight: 600;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-button:hover {
-  background-color: #6C6C6C; /* Slightly darker grey on hover */
-}
-
-button:active {
-  transform: translateY(1px); /* Button click effect */
-}
-
-/* Create Button with Plus Sign */
-.create-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 20px;
-  background-color: #9E9E9E; /* Premium grey */
-  color: white;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
-  font-size: 14px;
-  font-weight: 600;
-  transition: background-color 0.3s ease;
-}
-
-.create-btn:hover {
-  background-color: #6C6C6C; /* Slightly darker grey on hover */
-}
-
-.create-btn i {
-  margin-right: 8px;
-}
-
 /* Responsive Design for smaller devices */
 @media (max-width: 768px) {
   .tab-content {
     width: 90%;
   }
 }
-

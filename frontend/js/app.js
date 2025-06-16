@@ -1,27 +1,40 @@
 document.addEventListener('DOMContentLoaded', function () {
-  // Check if access token exists, otherwise redirect to login
   if (!localStorage.getItem("access_token")) {
-    window.location.href = "login.html";
-  }
-
-  const urlParams = new URLSearchParams(window.location.search);
-  const assetId = urlParams.get('asset_id');
-  const userId = urlParams.get('user_id');
-  const allocationId = urlParams.get('allocation_id');
-
-  if (assetId) {
-    fetchAssetDetails(assetId);
-  } else if (userId) {
-    fetchUserDetails(userId);
-  } else if (allocationId) {
-    fetchResourceAllocationDetails(allocationId);
+    window.location.href = "login.html";  // Redirect to login if not logged in
+  } else {
+    showTab('assets');
+    fetchAssets();
+    fetchUsers();
+    fetchAllocations();
   }
 });
 
-// Fetch Asset Details
-function fetchAssetDetails(assetId) {
+function showTab(tabName) {
+  // Remove active class from all tabs
+  const tabs = document.querySelectorAll('.tab-button');
+  tabs.forEach(tab => tab.classList.remove('active'));
+
+  // Add active class to the selected tab
+  document.getElementById(`${tabName}Tab`).classList.add('active');
+
+  // Hide all tab content
+  const tabContents = document.querySelectorAll('.tab-content');
+  tabContents.forEach(content => content.style.display = 'none');
+
+  // Show the selected tab's content
+  document.getElementById(tabName).style.display = 'block';
+}
+
+function logout() {
+  // Clear JWT token from localStorage and redirect to login page
+  localStorage.removeItem("access_token");
+  window.location.href = "login.html";
+}
+
+function fetchAssets() {
   const accessToken = localStorage.getItem("access_token");
-  fetch(`http://localhost:8000/api/assets/${assetId}/`, {
+
+  fetch("http://localhost:8000/api/assets/", {
     method: "GET",
     headers: {
       "Authorization": `Bearer ${accessToken}`,
@@ -30,25 +43,29 @@ function fetchAssetDetails(assetId) {
   })
   .then(response => response.json())
   .then(data => {
-    const content = document.getElementById("assetDetailContent");
-    content.innerHTML = `
-      <p><strong>Far ID:</strong> ${data.far_id}</p>
-      <p><strong>Brand:</strong> ${data.brand}</p>
-      <p><strong>Model Number:</strong> ${data.model_number}</p>
-      <p><strong>Asset Type:</strong> ${data.asset_type}</p>
-      <p><strong>Category:</strong> ${data.category}</p>
-      <p><strong>Purchase Date:</strong> ${data.purchase_date}</p>
-      <p><strong>Purchase Amount:</strong> ${data.purchase_amount}</p>
-      <p><strong>Allocated To:</strong> ${data.resource_user ? data.resource_user.name : 'None'}</p>
-    `;
+    const assetsList = document.getElementById("assetsList");
+    assetsList.innerHTML = '';
+    data.forEach(asset => {
+      const listItem = document.createElement("tr");
+      listItem.innerHTML = `
+        <td>${asset.far_id}</td>
+        <td>${asset.brand}</td>
+        <td>${asset.model_number}</td>
+        <td>${asset.asset_type}</td>
+        <td>${asset.category}</td>
+        <td style="color: ${asset.resource_user ? 'blue' : 'green'};">${asset.resource_user ? asset.resource_user.name : 'None'}</td>
+      `;
+      listItem.onclick = () => showAssetDetails(asset.id);
+      assetsList.appendChild(listItem);
+    });
   })
   .catch(error => console.error('Error:', error));
 }
 
-// Fetch User Details
-function fetchUserDetails(userId) {
+function fetchUsers() {
   const accessToken = localStorage.getItem("access_token");
-  fetch(`http://localhost:8000/api/resource-users/${userId}/`, {
+
+  fetch("http://localhost:8000/api/resource-users/", {
     method: "GET",
     headers: {
       "Authorization": `Bearer ${accessToken}`,
@@ -57,22 +74,26 @@ function fetchUserDetails(userId) {
   })
   .then(response => response.json())
   .then(data => {
-    const content = document.getElementById("userDetailContent");
-    content.innerHTML = `
-      <p><strong>Name:</strong> ${data.name}</p>
-      <p><strong>Department:</strong> ${data.department}</p>
-      <p><strong>Contact Info:</strong> ${data.contact_info}</p>
-      <p><strong>Created At:</strong> ${data.created_at}</p>
-      <p><strong>Allocated Assets:</strong> ${data.assets.map(asset => asset.far_id).join(', ')}</p>
-    `;
+    const usersList = document.getElementById("usersList");
+    usersList.innerHTML = '';
+    data.forEach(user => {
+      const listItem = document.createElement("tr");
+      listItem.innerHTML = `
+        <td>${user.name}</td>
+        <td>${user.department}</td>
+        <td>${user.contact_info}</td>
+      `;
+      listItem.onclick = () => showUserDetails(user.id);
+      usersList.appendChild(listItem);
+    });
   })
   .catch(error => console.error('Error:', error));
 }
 
-// Fetch Resource Allocation Details
-function fetchResourceAllocationDetails(allocationId) {
+function fetchAllocations() {
   const accessToken = localStorage.getItem("access_token");
-  fetch(`http://localhost:8000/api/allocations/${allocationId}/`, {
+
+  fetch("http://localhost:8000/api/allocations/", {
     method: "GET",
     headers: {
       "Authorization": `Bearer ${accessToken}`,
@@ -81,104 +102,35 @@ function fetchResourceAllocationDetails(allocationId) {
   })
   .then(response => response.json())
   .then(data => {
-    const content = document.getElementById("resourceAllocationContent");
-    content.innerHTML = `
-      <p><strong>Far ID:</strong> ${data.asset.far_id}</p>
-      <p><strong>Brand:</strong> ${data.asset.brand}</p>
-      <p><strong>Model Number:</strong> ${data.asset.model_number}</p>
-      <p><strong>Asset Type:</strong> ${data.asset.asset_type}</p>
-      <p><strong>Category:</strong> ${data.asset.category}</p>
-      <p><strong>Resource User:</strong> ${data.resource_user.name}</p>
-      <p><strong>Department:</strong> ${data.resource_user.department}</p>
-      <p><strong>Allocation Date:</strong> ${data.allocation_date}</p>
-    `;
+    const allocationsList = document.getElementById("allocationsList");
+    allocationsList.innerHTML = '';
+    data.forEach(allocation => {
+      const listItem = document.createElement("tr");
+      listItem.innerHTML = `
+        <td>${allocation.asset.far_id}</td>
+        <td>${allocation.asset.brand}</td>
+        <td>${allocation.asset.model_number}</td>
+        <td>${allocation.asset.asset_type}</td>
+        <td>${allocation.asset.category}</td>
+        <td>${allocation.resource_user.name}</td>
+        <td>${allocation.resource_user.department}</td>
+        <td>${allocation.resource_user.contact_info}</td>
+      `;
+      listItem.onclick = () => showAllocationDetails(allocation.id);
+      allocationsList.appendChild(listItem);
+    });
   })
   .catch(error => console.error('Error:', error));
 }
 
-// Function to delete an Asset
-function deleteAsset() {
-  const accessToken = localStorage.getItem("access_token");
-  const assetId = new URLSearchParams(window.location.search).get('asset_id');
-
-  fetch(`http://localhost:8000/api/assets/${assetId}/`, {
-    method: "DELETE",
-    headers: {
-      "Authorization": `Bearer ${accessToken}`,
-      "Content-Type": "application/json"
-    }
-  })
-  .then(response => response.json())
-  .then(data => {
-    alert('Asset deleted successfully');
-    window.location.href = "index.html";
-  })
-  .catch(error => console.error('Error:', error));
+function showAssetDetails(assetId) {
+  window.location.href = `asset_details.html?asset_id=${assetId}`;
 }
 
-// Function to delete a User
-function deleteUser() {
-  const accessToken = localStorage.getItem("access_token");
-  const userId = new URLSearchParams(window.location.search).get('user_id');
-
-  fetch(`http://localhost:8000/api/resource-users/${userId}/`, {
-    method: "DELETE",
-    headers: {
-      "Authorization": `Bearer ${accessToken}`,
-      "Content-Type": "application/json"
-    }
-  })
-  .then(response => response.json())
-  .then(data => {
-    alert('User deleted successfully');
-    window.location.href = "index.html";
-  })
-  .catch(error => console.error('Error:', error));
+function showUserDetails(userId) {
+  window.location.href = `user_details.html?user_id=${userId}`;
 }
 
-// Function to delete Resource Allocation
-function deleteAllocation() {
-  const accessToken = localStorage.getItem("access_token");
-  const allocationId = new URLSearchParams(window.location.search).get('allocation_id');
-
-  fetch(`http://localhost:8000/api/allocations/${allocationId}/`, {
-    method: "DELETE",
-    headers: {
-      "Authorization": `Bearer ${accessToken}`,
-      "Content-Type": "application/json"
-    }
-  })
-  .then(response => response.json())
-  .then(data => {
-    alert('Resource Allocation deleted successfully');
-    window.location.href = "index.html";
-  })
-  .catch(error => console.error('Error:', error));
-}
-
-// Function to update Asset
-function updateAsset() {
-  const accessToken = localStorage.getItem("access_token");
-  const assetId = new URLSearchParams(window.location.search).get('asset_id');
-
-  // Here, you will provide your logic to update the asset details
-  alert('Update Asset functionality is under development');
-}
-
-// Function to update User
-function updateUser() {
-  const accessToken = localStorage.getItem("access_token");
-  const userId = new URLSearchParams(window.location.search).get('user_id');
-
-  // Here, you will provide your logic to update the user details
-  alert('Update User functionality is under development');
-}
-
-// Function to update Resource Allocation
-function updateAllocation() {
-  const accessToken = localStorage.getItem("access_token");
-  const allocationId = new URLSearchParams(window.location.search).get('allocation_id');
-
-  // Here, you will provide your logic to update the allocation details
-  alert('Update Allocation functionality is under development');
+function showAllocationDetails(allocationId) {
+  window.location.href = `resource_allocation_details.html?allocation_id=${allocationId}`;
 }
