@@ -1,27 +1,33 @@
 document.addEventListener('DOMContentLoaded', function () {
-  if (!localStorage.getItem("access_token")) {
-    window.location.href = "login.html";  // Redirect to login if not logged in
+  const urlParams = new URLSearchParams(window.location.search);
+  const tabName = urlParams.get('tab'); // Get the tab name from the query parameter
+
+  if (tabName) {
+    // Call showTab with the tab value from the URL
+    showTab(tabName);
   } else {
+    // Default to 'assets' tab if no tab is provided
     showTab('assets');
-    fetchAssets();
-    fetchUsers();
-    fetchAllocations();
   }
+
+  fetchAssets();
+  fetchUsers();
+  fetchAllocations();
 });
 
 function showTab(tabName) {
-  // Remove active class from all tabs
+  // Remove the 'active' class from all tabs
   const tabs = document.querySelectorAll('.tab-button');
   tabs.forEach(tab => tab.classList.remove('active'));
 
-  // Add active class to the selected tab
+  // Add 'active' class to the clicked tab
   document.getElementById(`${tabName}Tab`).classList.add('active');
 
-  // Hide all tab content
+  // Hide all tab content sections
   const tabContents = document.querySelectorAll('.tab-content');
   tabContents.forEach(content => content.style.display = 'none');
 
-  // Show the selected tab's content
+  // Show the content of the selected tab
   document.getElementById(tabName).style.display = 'block';
 }
 
@@ -107,14 +113,14 @@ function fetchAllocations() {
     data.forEach(allocation => {
       const listItem = document.createElement("tr");
       listItem.innerHTML = `
-        <td>${allocation.asset.far_id}</td>
-        <td>${allocation.asset.brand}</td>
-        <td>${allocation.asset.model_number}</td>
-        <td>${allocation.asset.asset_type}</td>
-        <td>${allocation.asset.category}</td>
-        <td>${allocation.resource_user.name}</td>
-        <td>${allocation.resource_user.department}</td>
-        <td>${allocation.resource_user.contact_info}</td>
+        <td>${allocation.asset_detail.far_id}</td>
+        <td>${allocation.asset_detail.brand}</td>
+        <td>${allocation.asset_detail.model_number}</td>
+        <td>${allocation.asset_detail.asset_type}</td>
+        <td>${allocation.asset_detail.category}</td>
+        <td>${allocation.resource_user_detail.name}</td>
+        <td>${allocation.resource_user_detail.department}</td>
+        <td>${allocation.resource_user_detail.contact_info}</td>
       `;
       listItem.onclick = () => showAllocationDetails(allocation.id);
       allocationsList.appendChild(listItem);
